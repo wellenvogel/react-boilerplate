@@ -2,6 +2,6 @@
   "presets": [
     ["latest", { "modules": false }],
     "react",
-    "es2015"
+    "env"
   ]
 }

@@ -1,6 +1,6 @@
 const path=require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var isProduction=(process.env.NODE_ENV === 'production') || (process.argv.indexOf('-p') !== -1);
 
 let outdir="debug";
@@ -50,10 +50,7 @@ module.exports = function(env) {
                             loader: 'postcss-loader',
                             options: {
                                 config: {},
-                                ident: 'postcss',
-                                plugins: (loader) =>[
-                                    require('postcss-cssnext')()
-                                ]
+                                ident: 'postcss'
                             }
                         }
                     ]
@@ -62,13 +59,26 @@ module.exports = function(env) {
                 {
                     test: /\.css$/,
                     exclude: /node_modules.react-toolbox/,
-                    use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader'})
+                    use: [{
+                        loader: MiniCssExtractPlugin.loader
+                        },
+                        'css-loader']
                 },
 
                 {
                     test: /\.less$/,
                     exclude: /theme..*less/,
-                    use: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader?-url!less-loader"})
+                    use: [
+                        {
+                            loader: MiniCssExtractPlugin.loader
+                        },
+                        "css-loader?-url",
+                        {
+                            loader:"less-loader",
+                            options:{
+                                javascriptEnabled:true
+                            }
+                        }]
                 },
                 {
                     test: /theme.*\.less$/,
@@ -82,8 +92,12 @@ module.exports = function(env) {
                                 localIdentName: "[name]--[local]--[hash:base64:8]"
                             }
                         },
-                        'less-loader'
-
+                        {
+                            loader:"less-loader",
+                            options:{
+                                javascriptEnabled:true
+                            }
+                        }
                     ]
                 },
 
@@ -101,7 +115,12 @@ module.exports = function(env) {
                 {from: '../public'}
 
             ]),
-            new ExtractTextPlugin("index.css", {allChunks: true}),
+            new CopyWebpackPlugin(isProduction?[]:[
+                // {output}/file.txt
+                {from: '../test'}
+
+            ]),
+            new MiniCssExtractPlugin( {filename:"index.css"}),
         ],
         devtool: devtool
     }

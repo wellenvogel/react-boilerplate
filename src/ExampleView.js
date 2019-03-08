@@ -3,7 +3,7 @@ import ToolBar from './components/ToolBar';
 import IconButton from 'react-toolbox/lib/button';
 
 
-const url="/api/loadData";
+const url="Example.json";
 class ExampleView extends Component {
 
     constructor(props){
